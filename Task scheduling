@@ -1,0 +1,68 @@
+#!/bin/python3
+
+import math
+import os
+import random
+import re
+import sys
+
+#
+# Complete the 'taskScheduling' function below.
+#
+# The function is expected to return an INTEGER.
+# The function accepts following parameters:
+#  1. INTEGER d
+#  2. INTEGER m
+#
+MAX_D = 100005
+tree = [0] * (4 * MAX_D)
+lazy = [0] * (4 * MAX_D)
+def update(node, start, end, l, r, val):
+    if lazy[node] != 0:
+        tree[node] += lazy[node]
+        if start != end:
+            lazy[2 * node] += lazy[node]
+            lazy[2 * node + 1] += lazy[node]
+        lazy[node] = 0    
+    if start > end or start > r or end < l:
+        return
+    if start >= l and end <= r:
+        tree[node] += val
+        if start != end:
+            lazy[2 * node] += val
+            lazy[2 * node + 1] += val
+        return
+    mid = (start + end) // 2
+    update(2 * node, start, mid, l, r, val)
+    update(2 * node + 1, mid + 1, end, l, r, val)
+    tree[node] = max(tree[2 * node], tree[2 * node + 1])
+def build(node, start, end):
+    if start == end:
+        tree[node] = -start 
+        return
+    mid = (start + end) // 2
+    build(2 * node, start, mid)
+    build(2 * node + 1, mid + 1, end)
+    tree[node] = max(tree[2 * node], tree[2 * node + 1])
+build(1, 1, MAX_D)
+
+def taskScheduling(d, m):
+    update(1, 1, MAX_D, d, MAX_D, m)
+    return max(0, tree[1])
+if __name__ == '__main__':
+    fptr = open(os.environ['OUTPUT_PATH'], 'w')
+
+    t = int(input().strip())
+
+    for t_itr in range(t):
+        first_multiple_input = input().rstrip().split()
+
+        d = int(first_multiple_input[0])
+
+        m = int(first_multiple_input[1])
+
+        result = taskScheduling(d, m)
+
+        fptr.write(str(result) + '\n')
+
+    fptr.close()
