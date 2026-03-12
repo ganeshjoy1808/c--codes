@@ -1,0 +1,51 @@
+import sys
+sys.setrecursionlimit(200000)
+
+def get_distances(start_node, n, adj):
+    distances = [-1] * (n + 1)
+    distances[start_node] = 0
+    queue = [start_node]
+    idx = 0
+    while idx < len(queue):
+        u = queue[idx]
+        idx += 1
+        for v in adj[u]:
+            if distances[v] == -1:
+                distances[v] = distances[u] + 1
+                queue.append(v)
+    farthest_node = queue[-1]
+    return distances, farthest_node
+def journeyScheduling(n, roads, journeys):
+    adj = [[] for _ in range(n + 1)]
+    for u, v in roads:
+        adj[u].append(v)
+        adj[v].append(u)
+    _, a = get_distances(1, n, adj)
+    dist_a, b = get_distances(a, n, adj)
+    dist_b, _ = get_distances(b, n, adj)
+    diameter_len = dist_a[b]
+    results = []
+    for v, k in journeys:
+        first_trip = max(dist_a[v], dist_b[v])
+        total = first_trip + (k - 1) * diameter_len
+        results.append(total)
+    return results
+if __name__ == '__main__':
+    input_data = sys.stdin.read().split()
+    if not input_data:
+        exit()
+    ptr = 0
+    n = int(input_data[ptr]); ptr += 1
+    m = int(input_data[ptr]); ptr += 1
+    roads = []
+    for _ in range(n - 1):
+        u = int(input_data[ptr]); ptr += 1
+        v = int(input_data[ptr]); ptr += 1
+        roads.append((u, v))
+    journeys = []
+    for _ in range(m):
+        v = int(input_data[ptr]); ptr += 1
+        k = int(input_data[ptr]); ptr += 1
+        journeys.append((v, k))
+    result = journeyScheduling(n, roads, journeys)
+    sys.stdout.write('\n'.join(map(str, result)) + '\n')
