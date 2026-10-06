@@ -1,0 +1,36 @@
+#define MAX_CALLS 30005
+typedef struct {
+    int* valStack;
+    int* minStack;
+    int topIdx;
+} MinStack;
+MinStack* minStackCreate() {
+    MinStack* stack = (MinStack*)malloc(sizeof(MinStack));
+    stack->valStack = (int*)malloc(MAX_CALLS * sizeof(int));
+    stack->minStack = (int*)malloc(MAX_CALLS * sizeof(int));
+    stack->topIdx = -1;
+    return stack;
+}
+void minStackPush(MinStack* obj, int val) {
+    obj->topIdx++;
+    obj->valStack[obj->topIdx] = val;
+    if (obj->topIdx == 0 || val < obj->minStack[obj->topIdx - 1]) {
+        obj->minStack[obj->topIdx] = val;
+    } else {
+        obj->minStack[obj->topIdx] = obj->minStack[obj->topIdx - 1];
+    }
+}
+void minStackPop(MinStack* obj) {
+    obj->topIdx--;
+}
+int minStackTop(MinStack* obj) {
+    return obj->valStack[obj->topIdx];
+}
+int minStackGetMin(MinStack* obj) {
+    return obj->minStack[obj->topIdx];
+}
+void minStackFree(MinStack* obj) {
+    free(obj->valStack);
+    free(obj->minStack);
+    free(obj);
+}
